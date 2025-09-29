@@ -1,30 +1,32 @@
 from random import randint
 
+
 def stampa_griglia(n, pos, uscita):
     """Stampa la griglia con G = giocatore, U = uscita, . = spazio vuoto"""
-    # TODO
-    for r in range(0,n):
-        for c in range(0,n):
-            if r == pos[0] and c == pos[1]:
-                print("G", end="")
-            elif r == n-1 and c ==n-1:
-                print("U", end="")
+    for riga in range(n):
+        for colonna in range(n):
+            if [riga, colonna] == pos:
+                print('G', end=' ')
+            elif [riga, colonna] == uscita:
+                print('U', end=' ')
             else:
-                print(".", end="")
+                print('.', end=' ')
         print()
+
 
 def muovi(pos, mossa):
     """Aggiorna la posizione in base alla mossa"""
-    # TODO
-    if(mossa == 'n'):
-        pos[0] = pos[0]-1
-    if(mossa == 's'):
-        pos[0] = pos[0]+1
-    if(mossa == 'e'):
-        pos[1] = pos[1]+1
-    if(mossa == 'o'):
-        pos[1] = pos[1]-1
-    return pos
+    nuova_pos = pos.copy()
+    if mossa == 'n':
+        nuova_pos[0] -= 1
+    elif mossa == 's':
+        nuova_pos[0] += 1
+    elif mossa == 'o':
+        nuova_pos[1] -= 1
+    elif mossa == 'e':
+        nuova_pos[1] += 1
+
+    return nuova_pos
 
 
 def gestisci_livello(livello):
@@ -32,53 +34,46 @@ def gestisci_livello(livello):
     Ritorna:
     * True se il giocatore raggiunge l'uscita
     * False se il giocatore va oltre i limiti della griglia.
-
-    NB: Le funzioni stampa_griglia() e muovi() vanno chiamate dentro questa funzione
     """
 
-    # Inizializzazioni
     n = livello + 2
-    uscita = [n - 1, n - 1]  # posizione uscita
+    uscita = [n - 1, n - 1]
 
-    # TODO
-    x = randint(0, n-1)
-    y = randint(0, n-1)
+    pos = [randint(0, n - 2), randint(0, n - 2)]
+    print(f'Livello {livello}) Griglia {n}x{n}')
 
-    while(x == n-1 and y == n-1): # Per evitare che venga estratta come posizone del giocatore l'uscita
-        x = randint(0, n - 1)
-        y = randint(0, n - 1)
+    while True:
+        stampa_griglia(n, pos, uscita)
 
-    posizione = [x, y]
 
-    print(f"Livello {livello} Griglia {n}x{n}")
+        if pos == uscita:
+            print('Hai raggiunto l\'uscita!')
+            return True
 
-    finito = False
-    uscita = False
+        mossa = input('Mossa (n/s/e/o): ').strip().lower()
 
-    while not finito:
-        stampa_griglia(n, posizione, uscita)
 
-        print("Mossa (n/s/e/o): ", end="")
-        mossaLetta = input()
-        posizione = muovi(posizione, mossaLetta)
-        if(posizione[0] == n-1 and posizione[1] == n-1):
-            uscita = True
-            finito = True
-        if(posizione[0]<0 or posizione[0]>n-1 or posizione[1]<0 or posizione[1]>n-1):
-            uscita = False
-            finito = True
+        if mossa not in ['n', 's', 'e', 'o']:
+            print('Mossa non valida! Usa n/s/e/o')
+            continue
 
-    if(uscita == True):
-        print("Hai raggiunto l'uscita!")
-        return True
-    else:
-        print("GAMEOVER: Sei uscito dalla griglia!")
-        return False
+        nuova_pos = muovi(pos, mossa)
+
+
+        if (nuova_pos[0] < 0 or nuova_pos[0] >= n or
+                nuova_pos[1] < 0 or nuova_pos[1] >= n):
+            print('GAMEOVER: Sei uscito dalla griglia!')
+            return False
+
+        pos = nuova_pos
+
 
 def main():
     print("=== Benvenuto in Room Escape ===")
     livello = 0
     max_livello = 5
+
+
 
     while livello <= max_livello:
         completato = gestisci_livello(livello)
@@ -86,6 +81,11 @@ def main():
             livello += 1
         else:
             break
+
+    if livello > max_livello:
+        print('Complimenti! Hai completato tutti i livelli!')
+    else:
+        print(f'Game Over! Hai completato {livello} livelli.')
 
 
 if __name__ == "__main__":
